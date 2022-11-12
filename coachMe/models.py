@@ -66,3 +66,19 @@ class Package(models.Model):
     def __str__(self):
         return self.coach.first_name
 
+class Client(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    coach = models.ForeignKey(Coach, on_delete=models.CASCADE)
+    start_date = models.DateTimeField();
+    end_date = models.DateTimeField();
+    current_package_name = models.CharField(max_length=100)
+    package_desc = models.CharField(max_length=254)
+    duration_type = models.CharField(max_length=1, choices=DURATION_TYPE)
+    duration = models.IntegerField()
+    price_paid = models.IntegerField()
+
+    def __str__(self):
+        return self.user.first_name
+
+
+
