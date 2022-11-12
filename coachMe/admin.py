@@ -1,5 +1,8 @@
 from django.contrib import admin
-from coachMe.models import User
+from coachMe.models import User, Address, Certificate, Achievement
 
 # Register your models here.
-admin.site.register(User)
+admin.site.register(User),
+admin.site.register(Address),
+admin.site.register(Certificate),
+admin.site.register(Achievement)
