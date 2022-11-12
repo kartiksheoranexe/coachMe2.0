@@ -1,4 +1,5 @@
 from django.db import models
+import uuid
 from django.contrib.auth.models import AbstractUser
 
 
@@ -12,6 +13,23 @@ DURATION_TYPE = (
         ('M',  'Months'),
         ('D',  'Days')
 )
+
+STATUS = (
+        ('P', 'Pending'),
+        ('S',  'Success'),
+        ('C',  'Cancelled')
+)
+
+MODE = (
+        ('CC', 'Credit Card'),
+        ('DC',  'Debit Card'),
+        ('UPI',  'UPI')
+)
+
+TYPE = (
+        ('P', 'Purchase'),
+        ('R', 'Reverse'),
+    )
 
 class User(AbstractUser):
     dob = models.DateField(null=True, blank=True)
@@ -76,9 +94,22 @@ class Client(models.Model):
     duration_type = models.CharField(max_length=1, choices=DURATION_TYPE)
     duration = models.IntegerField()
     price_paid = models.IntegerField()
+    client_avatar = models.ImageField(upload_to='clientavatars/', null=True, blank=True)
 
     def __str__(self):
         return self.user.first_name
 
 
+class Transaction(models.Model):
+    unique_id = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
+    amount_paid = models.IntegerField()
+    status = models.CharField(max_length=1, choices=STATUS)
+    mode = models.CharField(max_length=3, choices=MODE)
+    date = models.DateField()
+    remark = models.CharField(max_length=100)
+    type = models.CharField(max_length=1, choices=TYPE)
+    client = models.ForeignKey(Client, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.unique_id
 
