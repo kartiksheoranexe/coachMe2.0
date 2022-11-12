@@ -7,6 +7,12 @@ GENDER_CHOICES = (
         ('F', 'Female'),
     )
 
+DURATION_TYPE = (
+        ('Y', 'Years'),
+        ('M',  'Months'),
+        ('D',  'Days')
+)
+
 class User(AbstractUser):
     dob = models.DateField(null=True, blank=True)
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
@@ -48,3 +54,15 @@ class Coach(models.Model):
 
     def __str__(self):
         return self.user.first_name
+
+class Package(models.Model):
+    coach = models.ForeignKey(User, on_delete=models.CASCADE)
+    package_name = models.CharField(max_length=100)
+    package_desc = models.CharField(max_length=254)
+    duration_type = models.CharField(max_length=1, choices=DURATION_TYPE)
+    duration = models.IntegerField()
+    price = models.IntegerField()
+
+    def __str__(self):
+        return self.coach.first_name
+
