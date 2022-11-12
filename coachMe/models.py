@@ -18,12 +18,33 @@ class Address(models.Model):
     long = models.DecimalField(max_digits=8, decimal_places=3)
     lat = models.DecimalField(max_digits=8, decimal_places=3)
 
+    def __str__(self):
+        return self.user.first_name
+
 class Certificate(models.Model):
     title = models.CharField(max_length=100)
     description = models.CharField(max_length=254)
     thumbnail = models.ImageField(upload_to ='certificates/')
 
+    def __str__(self):
+        return self.title
+
 class Achievement(models.Model):
     title = models.CharField(max_length=100)
     description = models.CharField(max_length=254)
-    thumbnail = models.ImageField(upload_to ='achievement/')
+    thumbnail = models.ImageField(upload_to ='achievements/')
+
+    def __str__(self):
+        return self.title
+
+class Coach(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    bio = models.CharField(max_length=254)
+    years_of_experience = models.FloatField(null=True, blank=True)
+    certifications = models.ManyToManyField(Certificate)
+    achievements = models.ManyToManyField(Achievement)
+    is_active = models.BooleanField(('active'), default=True)
+    coach_avatar = models.ImageField(upload_to='coachavatars/', null=True, blank=True)
+
+    def __str__(self):
+        return self.user.first_name
