@@ -1,11 +1,18 @@
 from django.db import models
 import uuid
+from phone_field import PhoneField
 from django.contrib.auth.models import AbstractUser
 
 
 GENDER_CHOICES = (
         ('M', 'Male'),
         ('F', 'Female'),
+    )
+
+USER_TYPE = (
+        ('U', 'User'),
+        ('C', 'Coach'),
+        ('L', 'Client')
     )
 
 DURATION_TYPE = (
@@ -34,6 +41,8 @@ TYPE = (
 class User(AbstractUser):
     dob = models.DateField(null=True, blank=True)
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
+    phone_no = PhoneField(blank=True, help_text='Contact phone number')
+    user_type = models.CharField(max_length=1, choices=USER_TYPE, null=True)
 
 class Address(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
