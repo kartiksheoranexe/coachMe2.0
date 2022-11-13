@@ -88,21 +88,22 @@ class Package(models.Model):
     package_desc = models.CharField(max_length=254)
     duration_type = models.CharField(max_length=1, choices=DURATION_TYPE)
     duration = models.IntegerField()
-    price = models.IntegerField()
+    base_price = models.IntegerField()
 
     def __str__(self):
-        return self.coach.first_name
+        return self.coach.first_name+ ' ' + self.package_name
+
+class PackageCoachMapping(models.Model):
+    package_id = models.ForeignKey(Package, on_delete=models.CASCADE)
+    coach_id = models.ForeignKey(Coach, on_delete=models.CASCADE)
+    price = models.IntegerField()
+
 
 class Client(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     coach = models.ForeignKey(Coach, on_delete=models.CASCADE)
     start_date = models.DateTimeField();
     end_date = models.DateTimeField();
-    current_package_name = models.CharField(max_length=100)
-    package_desc = models.CharField(max_length=254)
-    duration_type = models.CharField(max_length=1, choices=DURATION_TYPE)
-    duration = models.IntegerField()
-    price_paid = models.IntegerField()
     client_avatar = models.ImageField(upload_to='clientavatars/', null=True, blank=True)
 
     def __str__(self):
