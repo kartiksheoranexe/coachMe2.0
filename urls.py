@@ -15,8 +15,11 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from coachMe.views import CoachListAPIView, DisplayPackageAPIView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    
+    path('coach_me/coach_list/', CoachListAPIView.as_view()),
+    path('coach_me/package_list/', DisplayPackageAPIView.as_view())
+
 ]

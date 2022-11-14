@@ -40,7 +40,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'coachMe',
-    'phone_field'
+    'phone_field',
+    'rest_framework'
 ]
 
 MIDDLEWARE = [
