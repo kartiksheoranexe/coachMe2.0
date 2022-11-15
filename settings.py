@@ -41,8 +41,15 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'coachMe',
     'phone_field',
-    'rest_framework'
+    'rest_framework',
+    'knox'
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'knox.auth.TokenAuthentication',
+    ]
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
