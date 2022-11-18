@@ -16,16 +16,17 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from knox import views as knox_views
-from coachMe.views import CoachListAPIView, DisplayPackageAPIView, RegisterUserAPIView, LoginAPIView, PurchasePackageAPIView
+from coachMe.views import CoachListAPIView, DisplayPackageAPIView, RegisterUserAPIView, LoginAPIView, PurchasePackageAPIView, ClientInfoAPIView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('register_user/', RegisterUserAPIView.as_view(), name = 'register'),
+    path('register_user/', RegisterUserAPIView.as_view(), name='register'),
     path('login_user/', LoginAPIView.as_view(), name='login'),
     path('logout_user/', knox_views.LogoutView.as_view(), name='logout'),
 
     path('coach_me/coach_list/', CoachListAPIView.as_view()),
     path('coach_me/package_list/', DisplayPackageAPIView.as_view()),
+    path('çoach_me/client_info/', ClientInfoAPIView.as_view()),
 
     path('coach_me/purchase/', PurchasePackageAPIView.as_view())
 

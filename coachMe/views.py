@@ -167,3 +167,16 @@ class PurchasePackageAPIView(generics.ListAPIView):
                 if found == 0:
                     print('Incorrect Coach choice!')
                     continue
+
+
+class ClientInfoAPIView(generics.ListAPIView):
+    permission_class = [permissions.IsAuthenticated]
+    
+    def get(self, request, *args, **kwargs):
+        usr_obj = self.request.user
+        client_obj = Client.objects.filter(user=usr_obj)[0]
+        mapping_obj = Mapping.objects.filter(client_id=client_obj)[0]
+        pckg_name = mapping_obj.package_id.package_name
+        coach_name = mapping_obj.coach_id.user.first_name
+        client_name = mapping_obj.client.user.first_name
+        return Response({"package_id ": pckg_name , "coach_id " : coach_name, "price" : mapping_obj.price, "client " : client_name})
