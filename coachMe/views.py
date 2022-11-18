@@ -99,7 +99,6 @@ class PurchasePackageAPIView(generics.ListAPIView):
                             for i in packages:
                                 pkg_id = i.id
                                 purchase_amount = i.base_price
-                                
 
                                 if user_package_input == pkg_id:
                                     found = 1
@@ -136,12 +135,9 @@ class PurchasePackageAPIView(generics.ListAPIView):
                                         else:
                                             print("Enter correct mode number.")
 
-                                
                                         current_user.user_type = 'L'
                                         current_user.save()
                                         break
-                                        
-                                        
 
                                     else:
                                         return -1
@@ -151,16 +147,14 @@ class PurchasePackageAPIView(generics.ListAPIView):
 
                             return 0
                         output = confirmation(user_package_input)
-                        
+
                         if output == -1:
                             continue
                         else:
-                            
+
                             break
-                        
 
                 if found == 0:
                     print('Incorrect Coach choice!')
                     continue
-                return Response({"Coach Hired!": "Success!","Coach": coach_obj.user.first_name,  "Client" : current_user.first_name, "Package": pckg_name, "Price": amount_paid})
-            
+                return Response({"Coach Hired!": "Success!", "Coach": coach_obj.user.first_name,  "Client": current_user.first_name, "Package": pckg_name, "Price": amount_paid})
