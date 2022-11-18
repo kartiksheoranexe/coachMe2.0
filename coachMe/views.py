@@ -16,6 +16,8 @@ from coachMe.serializers import CoachListSerializer, PackageListSerializer, User
 from coachMe.wrappers import welcome
 
 # Create your views here.
+
+
 class RegisterUserAPIView(generics.GenericAPIView):
     serializer_class = RegisterUserSerializer
     permission_class = [permissions.IsAuthenticated]
@@ -100,7 +102,8 @@ class PurchasePackageAPIView(generics.ListAPIView):
                             for i in packages:
                                 pkg_id = i.id
                                 purchase_amount = i.base_price
-                                package_obj = Package.objects.filter(id=i.id).first()
+                                package_obj = Package.objects.filter(
+                                    id=i.id).first()
                                 if user_package_input == pkg_id:
                                     found = 1
                                     print(user_package_input)
@@ -141,8 +144,9 @@ class PurchasePackageAPIView(generics.ListAPIView):
 
                                         current_user.user_type = 'L'
                                         current_user.save()
-                                    
-                                        print({"Coach Hired!": "Success!", "Coach": coach_obj.user.first_name,  "Client": current_user.first_name, "Package": pckg_name, "Price": amount_paid})
+
+                                        print({"Coach Hired!": "Success!", "Coach": coach_obj.user.first_name,
+                                              "Client": current_user.first_name, "Package": pckg_name, "Price": amount_paid})
                                         break
 
                                     else:
@@ -163,4 +167,3 @@ class PurchasePackageAPIView(generics.ListAPIView):
                 if found == 0:
                     print('Incorrect Coach choice!')
                     continue
-                
