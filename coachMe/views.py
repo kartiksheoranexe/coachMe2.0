@@ -13,7 +13,7 @@ from knox.views import LoginView as KnoxLoginView
 
 from coachMe.models import Coach, Package, User, Client, Mapping, Transaction
 from coachMe.serializers import CoachListSerializer, PackageListSerializer, UserSerializer, RegisterUserSerializer
-
+from coachMe.wrappers import welcome
 
 # Create your views here.
 class RegisterUserAPIView(generics.GenericAPIView):
@@ -55,6 +55,7 @@ class PurchasePackageAPIView(generics.ListAPIView):
     permission_class = [permissions.IsAuthenticated]
 
     def post(self, request, *args, **kwargs):
+        welcome()
         current_user = self.request.user
         print("Welcome !  " + current_user.first_name)
         if (current_user.user_type == 'U') or (current_user.user_type == 'L'):
@@ -99,7 +100,7 @@ class PurchasePackageAPIView(generics.ListAPIView):
                             for i in packages:
                                 pkg_id = i.id
                                 purchase_amount = i.base_price
-
+                                package_obj = Package.objects.filter(id=i.id).first()
                                 if user_package_input == pkg_id:
                                     found = 1
                                     print(user_package_input)
@@ -115,6 +116,9 @@ class PurchasePackageAPIView(generics.ListAPIView):
                                         u_id = uuid.uuid4()  # for Transaction objects creating while purchasing
                                         transaction, created = Transaction.objects.get_or_create(
                                             unique_id=u_id, amount_paid=purchase_amount, status='P', mode='ND', remark='Purchase Succesfull', type='P', client=client)
+                                        mapping, created = Mapping.objects.get_or_create(
+                                            package_id=package_obj, coach_id=coach_obj, price=purchase_amount, client=client
+                                        )
                                         print("Select Mode :  ")
                                         print(
                                             "Press 1 for Credit Card, 2 for Debit Card, 3 for UPI) :")
@@ -137,6 +141,8 @@ class PurchasePackageAPIView(generics.ListAPIView):
 
                                         current_user.user_type = 'L'
                                         current_user.save()
+                                    
+                                        print({"Coach Hired!": "Success!", "Coach": coach_obj.user.first_name,  "Client": current_user.first_name, "Package": pckg_name, "Price": amount_paid})
                                         break
 
                                     else:
@@ -157,4 +163,4 @@ class PurchasePackageAPIView(generics.ListAPIView):
                 if found == 0:
                     print('Incorrect Coach choice!')
                     continue
-                return Response({"Coach Hired!": "Success!", "Coach": coach_obj.user.first_name,  "Client": current_user.first_name, "Package": pckg_name, "Price": amount_paid})
+                
