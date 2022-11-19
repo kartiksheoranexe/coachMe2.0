@@ -293,7 +293,14 @@ class OnboardingAPIView(APIView):
                                                                    past_curr_injuries=inj, veg_non_veg=vg, no_of_meals=no_meals, curr_eating_pattern=c_eating,
                                                                    cheat_meals=ch_meal, easily_reach_food=food_srcs, expectations_from_caoch=excpttns)
             print("Thank You!")
-            print("Welcome to the " + coach_obj.user.first_name + " team!!!")
-            return Response({"Success!!"})
+            print("Welcome to the " + coach_obj.user.first_name +"'s" + " team!!!")
+            return Response({"coach " : coach_obj.user.first_name, "client " : client_obj.user.first_name,
+                        "goal ": f_goal, "height" : c_height, "weight " : c_weight, "neck_inches " : c_neck, "shoulder_inches ":c_shoulder,
+                        "waist_inches " : c_waist, "quads_inches " : c_quad, "calf_inches" : c_calve, "daily_act_level ": act_lvl,
+                        "gym_join " : gym_availability, "curr_workout_patt " :  c_wrk_splt, "pref_workout_time " : prf_wrk_tim,
+                        "avg_sleeping_hours" : avg_sh, "sleep_quality" : c_sleep, "stress_levels" : c_stress, "any_diff_mov" : diff_mov,
+                        "health_related_issues":c_health, "supps" : c_supp, "anabolics" : c_ana, "anabolics_desc" : c_ana_des,
+                        "past_curr_injuries" : inj, "veg_non_veg" : vg, "no_of_meals": no_meals, "curr_eating_pattern":c_eating,
+                        "cheat_meals" : ch_meal, "easily_reach_food" : food_srcs, "expectations_from_caoch" : excpttns})
         else:
             return Response({"No User Found!!"})
