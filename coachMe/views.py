@@ -7,11 +7,12 @@ import uuid
 from rest_framework.response import Response
 from rest_framework.authtoken.serializers import AuthTokenSerializer
 from rest_framework import generics, permissions
+from rest_framework.views import APIView
 
 from knox.models import AuthToken
 from knox.views import LoginView as KnoxLoginView
 
-from coachMe.models import Coach, Package, User, Client, Mapping, Transaction
+from coachMe.models import Coach, Package, User, Client, Mapping, Transaction, ClientOnboard
 from coachMe.serializers import CoachListSerializer, PackageListSerializer, UserSerializer, RegisterUserSerializer
 from coachMe.wrappers import *
 
@@ -70,10 +71,12 @@ class PurchasePackageAPIView(generics.ListAPIView):
 
             while True:
                 print("Coache's available: ")
+                sleep(1)
                 coach_list = coach_api_call.json()
                 for select_coach in coach_list:
                     print(select_coach['coach_name'])
                 print("Select a coach : ")
+                sleep(1)
                 user_input = input()
                 for select_coach in coach_list:
                     found = 0
@@ -86,6 +89,7 @@ class PurchasePackageAPIView(generics.ListAPIView):
                         packages = Package.objects.filter(coach_id=coach_obj)
 
                         print("Package's Avaiable : ")
+                        sleep(1)
                         for i in packages:
                             pkg_id = i.id
                             amount_paid = i.base_price
@@ -114,6 +118,7 @@ class PurchasePackageAPIView(generics.ListAPIView):
                                           int(purchase_amount))
                                     print(
                                         "Type Yes to confirm or No to return to the coach list")
+                                    sleep(1)
                                     confirmation = input()
                                     if confirmation == "YES" or confirmation == "yes":
                                         client, created = Client.objects.update_or_create(
@@ -129,6 +134,7 @@ class PurchasePackageAPIView(generics.ListAPIView):
                                         print(
                                             "Press 1 for Credit Card, 2 for Debit Card, 3 for UPI) :")
                                         payment_confirm = int(input())
+                                        sleep(1)
                                         if payment_confirm == 1 or 2 or 3:
                                             if payment_confirm == 1:
                                                 transaction.status = 'S'
@@ -174,7 +180,7 @@ class PurchasePackageAPIView(generics.ListAPIView):
 
 class ClientInfoAPIView(generics.ListAPIView):
     permission_class = [permissions.IsAuthenticated]
-    
+
     def get(self, request, *args, **kwargs):
         usr_obj = self.request.user
         client_obj = Client.objects.filter(user=usr_obj)[0]
@@ -182,4 +188,112 @@ class ClientInfoAPIView(generics.ListAPIView):
         pckg_name = mapping_obj.package_id.package_name
         coach_name = mapping_obj.coach_id.user.first_name
         client_name = mapping_obj.client.user.first_name
-        return Response({"package_id ": pckg_name , "coach_id " : coach_name, "price" : mapping_obj.price, "client " : client_name})
+        return Response({"package_id ": pckg_name, "coach_id ": coach_name, "price": mapping_obj.price, "client ": client_name})
+
+
+class OnboardingAPIView(APIView):
+    permission_class = [permissions.IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        usr_obj = self.request.user
+        if usr_obj:
+            client_obj = Client.objects.filter(user=usr_obj)[0]
+            coach_obj = client_obj.coach
+            print("Welcome to the Client Onboarding Section!!" +
+                  " " + usr_obj.first_name)
+            sleep(1)
+            print("What is your goal ? ")
+            f_goal = input()
+            sleep(1)
+            print("Please enter your height in feet : ")
+            c_height = float(input())
+            sleep(1)
+            print("Please enter your weight in kg : ")
+            c_weight = float(input())
+            sleep(1)
+            print("Please tell your measurements in inches : ")
+            sleep(1)
+            print("Neck : ")
+            c_neck = float(input())
+            print("Shoulder : ")
+            c_shoulder = float(input())
+            print("Waist : ")
+            c_waist = float(input())
+            print("Quad : ")
+            c_quad = float(input())
+            print("Calve : ")
+            c_calve = float(input())
+            sleep(1)
+            print("What is your daily activity level ? ")
+            print("Rate out of 10")
+            act_lvl = int(input())
+            print("Can you join gym? Type Y for yes or N for no")
+            gym_availability = input()
+            sleep(1)
+            print("What is your current workout pattern/split? (Ans in detail)")
+            c_wrk_splt = input()
+            sleep(1)
+            print("What is your preferrable workout timings ? ")
+            prf_wrk_tim = input()
+            sleep(1)
+            print("What is your average sleeping hours ? ")
+            avg_sh = int(input())
+            sleep(1)
+            print("Rate your sleep quality out of 10 : ")
+            c_sleep = int(input())
+            sleep(1)
+            print("Rate your stress levels out of 10 : ")
+            c_stress = int(input())
+            sleep(1)
+            print("Any difficulties you face during doing a specific movement ? ")
+            diff_mov = input()
+            sleep(1)
+            print("Please mention if you have any health related issues : ")
+            c_health = input()
+            sleep(1)
+            print("What current supplements you are using ? ")
+            c_supp = input()
+            sleep(1)
+            print("Have you ever used anabolics ? Type Y for yes or N for no")
+            c_ana = input()
+            if c_ana == 'Y':
+                print("Mention salt names and dosages : ")
+                c_ana_des = input()
+            else:
+                c_ana_des = "NO"
+            sleep(1)
+            print("Please mention your past/current injuries : ")
+            inj = input()
+            sleep(1)
+            print("Vegeterian or Non-Vegeterian ? ")
+            print("Type V for veg or N for non-veg")
+            vg = input()
+            sleep(1)
+            print("How many meals you can take per day? Mention all the possibilities")
+            no_meals = input()
+            sleep(1)
+            print("What is your current eating pattern ? Explain in detail")
+            c_eating = input()
+            sleep(1)
+            print(
+                "Tell food choices that you can't ignore ? Will try best to include but NO PROMISES!")
+            ch_meal = input()
+            sleep(1)
+            print("Mention food sources that are easily in reach ?")
+            food_srcs = input()
+            sleep(1)
+            print("What are your expectations from your coach ? ")
+            excpttns = input()
+            onboard, created = ClientOnboard.objects.get_or_create(coach=coach_obj, client=client_obj,
+                                                                   goal=f_goal, height=c_height, weight=c_weight, neck_inches=c_neck, shoulder_inches=c_shoulder,
+                                                                   waist_inches=c_waist, quads_inches=c_quad, calf_inches=c_calve, daily_act_level=act_lvl,
+                                                                   gym_join=gym_availability, curr_workout_patt=c_wrk_splt, pref_workout_time=prf_wrk_tim,
+                                                                   avg_sleeping_hours=avg_sh, sleep_quality=c_sleep, stress_levels=c_stress, any_diff_mov=diff_mov,
+                                                                   health_related_issues=c_health, supps=c_supp, anabolics=c_ana, anabolics_desc=c_ana_des,
+                                                                   past_curr_injuries=inj, veg_non_veg=vg, no_of_meals=no_meals, curr_eating_pattern=c_eating,
+                                                                   cheat_meals=ch_meal, easily_reach_food=food_srcs, expectations_from_caoch=excpttns)
+            print("Thank You!")
+            print("Welcome to the " + coach_obj.user.first_name + " team!!!")
+            return Response({"Success!!"})
+        else:
+            return Response({"No User Found!!"})

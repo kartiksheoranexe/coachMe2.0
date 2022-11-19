@@ -1,4 +1,4 @@
-from coachMe.models import Coach, Package
+from coachMe.models import Coach, Package, ClientOnboard
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 
@@ -40,3 +40,7 @@ class PackageListSerializer(serializers.ModelSerializer):
         model = Package
         fields = ['coach_name', 'package_name', 'package_desc',
                   'duration_type', 'duration', 'base_price']
+
+class OnboardSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ClientOnboard
