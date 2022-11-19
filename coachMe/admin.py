@@ -1,6 +1,6 @@
 from django.contrib import admin
-from coachMe.models import User, Address, Certificate, Achievement, Coach, Package, Client, Transaction, Mapping
-                            
+from coachMe.models import User, Address, Certificate, Achievement, Coach, Package, Client, Transaction, Mapping, ClientOnboard
+
 
 # Register your models here.
 admin.site.register(User),
@@ -11,4 +11,5 @@ admin.site.register(Coach),
 admin.site.register(Package),
 admin.site.register(Client),
 admin.site.register(Transaction),
-admin.site.register(Mapping)
+admin.site.register(Mapping),
+admin.site.register(ClientOnboard)

@@ -13,7 +13,7 @@ from knox.views import LoginView as KnoxLoginView
 
 from coachMe.models import Coach, Package, User, Client, Mapping, Transaction
 from coachMe.serializers import CoachListSerializer, PackageListSerializer, UserSerializer, RegisterUserSerializer
-from coachMe.wrappers import welcome
+from coachMe.wrappers import *
 
 # Create your views here.
 
@@ -57,8 +57,11 @@ class PurchasePackageAPIView(generics.ListAPIView):
     permission_class = [permissions.IsAuthenticated]
 
     def post(self, request, *args, **kwargs):
-        welcome()
         current_user = self.request.user
+        print("Welcome to CoachMe Application!")
+        sleep(1)
+        print("Start your transformation journey today!")
+        sleep(1)
         print("Welcome !  " + current_user.first_name)
         if (current_user.user_type == 'U') or (current_user.user_type == 'L'):
             url = 'http://127.0.0.1:8000/coach_me/coach_list/'

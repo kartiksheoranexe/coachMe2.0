@@ -39,6 +39,16 @@ TYPE = (
     ('R', 'Reverse'),
 )
 
+YES_NO = (
+    ('Y', 'Yes'),
+    ('N', 'No'),
+)
+
+V_NV = (
+    ('V', 'Veg'),
+    ('N', 'Non Veg'),
+)
+
 
 class User(AbstractUser):
     dob = models.DateField(null=True, blank=True)
@@ -133,3 +143,42 @@ class Transaction(models.Model):
 
     def __str__(self):
         return str(self.unique_id)
+
+class ClientOnboard(models.Model):
+    coach = models.ForeignKey(Coach, on_delete=models.CASCADE)
+    client = models.ForeignKey(Client, on_delete=models.CASCADE)
+    goal = models.CharField(max_length=254)
+    height = models.FloatField()
+    weight = models.FloatField()
+    neck_inches = models.FloatField()
+    shoulder_inches = models.FloatField()
+    waist_inches = models.FloatField()
+    quads_inches = models.FloatField()
+    calf_inches = models.FloatField()
+    daily_act_level = models.IntegerField()
+    gym_join = models.CharField(max_length=1, choices=YES_NO)
+    curr_workout_patt = models.TextField()
+    pref_workout_time = models.CharField(max_length=100)
+    avg_sleeping_hours = models.FloatField()
+    sleep_quality = models.IntegerField()
+    stress_levels = models.IntegerField()
+    any_diff_mov = models.TextField()
+    health_related_issues = models.TextField()
+    supps = models.TextField()
+    anabolics = models.CharField(max_length=1, choices=YES_NO)
+    anabolics_desc = models.TextField()
+    past_curr_injuries = models.TextField()
+    veg_non_veg = models.CharField(max_length=1, choices=V_NV)
+    no_of_meals = models.TextField()
+    curr_eating_pattern = models.TextField()
+    cheat_meals = models.TextField()
+    easily_reach_food = models.TextField()
+    curr_physique_pic = models.ImageField(
+        upload_to='current physique/', null=True, blank=True)
+    expectations_from_caoch = models.TextField()
+
+    def __str__(self):
+        return self.coach.user.first_name + ' ' + self.client.user.first_name
+    
+
+
