@@ -13,7 +13,13 @@ from rest_framework.views import APIView
 from knox.models import AuthToken
 from knox.views import LoginView as KnoxLoginView
 
-import email, smtplib, ssl
+from pyexcel_xls import get_data as xls_get
+from pyexcel_xlsx import get_data as xlsx_get
+from django.utils.datastructures import MultiValueDictKeyError
+
+import email
+import smtplib
+import ssl
 from email import encoders
 from email.mime.base import MIMEBase
 from email.mime.multipart import MIMEMultipart
@@ -58,7 +64,8 @@ class RegisterAsCoachAPI(generics.ListAPIView):
         usr_obj = self.request.user
         if usr_obj:
             if usr_obj.user_type == 'U':
-                print("Wlecome to register yourself as a coach : " + usr_obj.first_name)
+                print("Wlecome to register yourself as a coach : " +
+                      usr_obj.first_name)
                 sleep(1)
                 print("Tell us about yourself : ")
                 intro = input()
@@ -66,7 +73,10 @@ class RegisterAsCoachAPI(generics.ListAPIView):
                 print("Mention years of experience : ")
                 exp = float(input())
                 sleep(1)
-                coach_obj, created = Coach.objects.get_or_create(user=usr_obj, bio=intro, years_of_experience=exp)
+                coach_obj, created = Coach.objects.get_or_create(
+                    user=usr_obj, bio=intro, years_of_experience=exp)
+                usr_obj.user_type == 'C'
+                usr_obj.save()
                 return Response({"Coach Registered Successfully!"})
             else:
                 return Response({"Already a Coach/Client obj exists for this user."})
@@ -345,8 +355,8 @@ class SendEmailAPIView(generics.ListAPIView):
         client_obj = Client.objects.filter(user=usr_obj)[0]
         client_email = client_obj.user.email
         coach_email = client_obj.coach.user.email
-        #email functionality to send client onboarding excel file to client email's
-        port = 587  
+        # email functionality to send client onboarding excel file to client email's
+        port = 587
         # For starttls
         smtp_server = "smtp.gmail.com"
         subject = "Find Client onboarding file in attachment"
@@ -372,7 +382,7 @@ class SendEmailAPIView(generics.ListAPIView):
             part = MIMEBase("application", "vnd.ms-excel")
             part.set_payload(attachment.read())
 
-        # Encode file in ASCII characters to send by email    
+        # Encode file in ASCII characters to send by email
         encoders.encode_base64(part)
 
         part.add_header(
@@ -392,3 +402,59 @@ class SendEmailAPIView(generics.ListAPIView):
             server.sendmail(sender_email, receiver_email, text)
 
         return Response({"Email Sent Successfully!!"})
+
+
+class ParseOnboardAPIView(generics.ListAPIView):
+    permission_class = [permissions.IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        usr_obj = self.request.user
+        if usr_obj:
+            if usr_obj.user_type == 'U' or usr_obj.user_type == 'L':
+                client_obj = Client.objects.filter(user=usr_obj)[0]
+                coach_obj = client_obj.coach
+                try:
+                    onboard_file = request.FILES['ClientOnboard']
+                    if (str(onboard_file).split('.')[-1] == "xls"):
+                        data = xls_get(onboard_file, column_limit=2)
+                    elif (str(onboard_file).split('.')[-1] == "xlsx"):
+                        data = xlsx_get(onboard_file, column_limit=2)
+                        # print(data)
+                        onboard_data = data["Onboard Tab"]
+                        # print(onboard_data)
+
+                        if (len(onboard_data) > 1):
+                            new_onb = []
+                            for onb_data in onboard_data:
+                                for y in onb_data:
+                                    new_onb.append(y)
+                            # print(new_onb)
+                            if (len(new_onb) > 0):
+
+                                if (new_onb[0] == "Goal (Lifestyle/Natural body building)"):
+
+                                    
+                                    ana = new_onb[48]
+                                    check_y = "yes"
+                                    if check_y in ana.lower():
+
+                                        output = "Y"
+
+                                        onb_obj, created = ClientOnboard.objects.get_or_create(coach=coach_obj, client=client_obj, goal=new_onb[0], height=new_onb[11], weight=new_onb[13], neck_inches=new_onb[16], chest_inches=new_onb[20], shoulder_inches=new_onb[18], waist_inches=new_onb[22], quads_inches=new_onb[26], calf_inches=new_onb[24], daily_act_level=new_onb[28], gym_join=new_onb[30], curr_workout_patt=new_onb[32], pref_workout_time=new_onb[
+                                                                                              34], avg_sleeping_hours=new_onb[36], sleep_quality=new_onb[38], stress_levels=new_onb[40], any_diff_mov=new_onb[42], health_related_issues=new_onb[44], supps=new_onb[46], anabolics=output, anabolics_desc=new_onb[48], past_curr_injuries=new_onb[50], veg_non_veg=new_onb[52], no_of_meals=new_onb[54], curr_eating_pattern=new_onb[56], cheat_meals=new_onb[58], easily_reach_food=new_onb[60], expectations_from_caoch=new_onb[61])
+                                        return Response({"Successfully client onboarded object created!"})
+                                    else:
+                                        output = "N"
+                                        onb_obj, created = ClientOnboard.objects.get_or_create(coach=coach_obj, client=client_obj, goal=new_onb[0], height=new_onb[11], weight=new_onb[13], neck_inches=new_onb[16], chest_inches=new_onb[20], shoulder_inches=new_onb[18], waist_inches=new_onb[22], quads_inches=new_onb[26], calf_inches=new_onb[24], daily_act_level=new_onb[28], gym_join=new_onb[30], curr_workout_patt=new_onb[32], pref_workout_time=new_onb[
+                                                                                               34], avg_sleeping_hours=new_onb[36], sleep_quality=new_onb[38], stress_levels=new_onb[40], any_diff_mov=new_onb[42], health_related_issues=new_onb[44], supps=new_onb[46], anabolics=output, anabolics_desc=new_onb[48], past_curr_injuries=new_onb[50], veg_non_veg=new_onb[52], no_of_meals=new_onb[54], curr_eating_pattern=new_onb[56], cheat_meals=new_onb[58], easily_reach_food=new_onb[60], expectations_from_caoch=new_onb[61])
+                                        return Response({"Successfully client onboarded object created!"})
+                    else:
+                        return Response({"File Upload fail!"})
+
+                except MultiValueDictKeyError:
+                    return Response({"No client onboarding file attached!"})
+            else:
+                return Response({"User is a coach!"})
+
+        else:
+            return Response({"No user found !"})

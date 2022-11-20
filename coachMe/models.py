@@ -151,6 +151,7 @@ class ClientOnboard(models.Model):
     height = models.FloatField()
     weight = models.FloatField()
     neck_inches = models.FloatField()
+    chest_inches = models.FloatField(null=True)
     shoulder_inches = models.FloatField()
     waist_inches = models.FloatField()
     quads_inches = models.FloatField()
