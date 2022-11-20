@@ -12,6 +12,12 @@ from rest_framework.views import APIView
 from knox.models import AuthToken
 from knox.views import LoginView as KnoxLoginView
 
+import email, smtplib, ssl
+from email import encoders
+from email.mime.base import MIMEBase
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+
 from coachMe.models import Coach, Package, User, Client, Mapping, Transaction, ClientOnboard
 from coachMe.serializers import CoachListSerializer, PackageListSerializer, UserSerializer, RegisterUserSerializer
 from coachMe.wrappers import *
@@ -293,14 +299,72 @@ class OnboardingAPIView(APIView):
                                                                    past_curr_injuries=inj, veg_non_veg=vg, no_of_meals=no_meals, curr_eating_pattern=c_eating,
                                                                    cheat_meals=ch_meal, easily_reach_food=food_srcs, expectations_from_caoch=excpttns)
             print("Thank You!")
-            print("Welcome to the " + coach_obj.user.first_name +"'s" + " team!!!")
-            return Response({"coach " : coach_obj.user.first_name, "client " : client_obj.user.first_name,
-                        "goal ": f_goal, "height" : c_height, "weight " : c_weight, "neck_inches " : c_neck, "shoulder_inches ":c_shoulder,
-                        "waist_inches " : c_waist, "quads_inches " : c_quad, "calf_inches" : c_calve, "daily_act_level ": act_lvl,
-                        "gym_join " : gym_availability, "curr_workout_patt " :  c_wrk_splt, "pref_workout_time " : prf_wrk_tim,
-                        "avg_sleeping_hours" : avg_sh, "sleep_quality" : c_sleep, "stress_levels" : c_stress, "any_diff_mov" : diff_mov,
-                        "health_related_issues":c_health, "supps" : c_supp, "anabolics" : c_ana, "anabolics_desc" : c_ana_des,
-                        "past_curr_injuries" : inj, "veg_non_veg" : vg, "no_of_meals": no_meals, "curr_eating_pattern":c_eating,
-                        "cheat_meals" : ch_meal, "easily_reach_food" : food_srcs, "expectations_from_caoch" : excpttns})
+            print("Welcome to the " + coach_obj.user.first_name + "'s" + " team!!!")
+            return Response({"coach ": coach_obj.user.first_name, "client ": client_obj.user.first_name,
+                             "goal ": f_goal, "height": c_height, "weight ": c_weight, "neck_inches ": c_neck, "shoulder_inches ": c_shoulder,
+                             "waist_inches ": c_waist, "quads_inches ": c_quad, "calf_inches": c_calve, "daily_act_level ": act_lvl,
+                             "gym_join ": gym_availability, "curr_workout_patt ":  c_wrk_splt, "pref_workout_time ": prf_wrk_tim,
+                             "avg_sleeping_hours": avg_sh, "sleep_quality": c_sleep, "stress_levels": c_stress, "any_diff_mov": diff_mov,
+                             "health_related_issues": c_health, "supps": c_supp, "anabolics": c_ana, "anabolics_desc": c_ana_des,
+                             "past_curr_injuries": inj, "veg_non_veg": vg, "no_of_meals": no_meals, "curr_eating_pattern": c_eating,
+                             "cheat_meals": ch_meal, "easily_reach_food": food_srcs, "expectations_from_caoch": excpttns})
         else:
             return Response({"No User Found!!"})
+
+
+
+class SendEmailAPIView(generics.ListAPIView):
+    permission_class = [permissions.IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        usr_obj = self.request.user
+        client_obj = Client.objects.filter(user=usr_obj)[0]
+        client_email = client_obj.user.email
+        coach_email = client_obj.coach.user.email
+        #email functionality to send client onboarding excel file to client email's
+        port = 587  
+        # For starttls
+        smtp_server = "smtp.gmail.com"
+        subject = "Find Client onboarding file in attachment"
+        body = "An automated email with Client onboarding file in attachment"
+        sender_email = coach_email
+        receiver_email = client_email
+        # password = input("Type your password : ")
+        password = "cvkxfyohyoqxxsno"
+
+        message = MIMEMultipart()
+        message["From"] = sender_email
+        message["To"] = receiver_email
+        message["Subject"] = subject
+        message["Bcc"] = receiver_email
+
+        message.attach(MIMEText(body, "plain"))
+
+        filename = "D:\CoachMe\coachMe\coachMe\Clientonboard.xlsx"
+
+        with open(filename, "rb") as attachment:
+            # Add file as application/vnd.ms-excel
+            # Email client can usually download this automatically as attachment
+            part = MIMEBase("application", "vnd.ms-excel")
+            part.set_payload(attachment.read())
+
+        # Encode file in ASCII characters to send by email    
+        encoders.encode_base64(part)
+
+        part.add_header(
+            "Content-Disposition",
+            f"attachment; filename= {filename}",
+        )
+
+        message.attach(part)
+        text = message.as_string()
+
+        context = ssl.create_default_context()
+        with smtplib.SMTP(smtp_server, port) as server:
+            server.ehlo()  # Can be omitted
+            server.starttls(context=context)
+            server.ehlo()  # Can be omitted
+            server.login(sender_email, password)
+            server.sendmail(sender_email, receiver_email, text)
+
+        return Response({"Email Sent Successfully!!"})
