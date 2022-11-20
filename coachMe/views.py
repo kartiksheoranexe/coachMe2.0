@@ -3,6 +3,7 @@ from django.contrib.auth import login
 
 import requests
 import uuid
+from time import sleep
 
 from rest_framework.response import Response
 from rest_framework.authtoken.serializers import AuthTokenSerializer
@@ -48,6 +49,30 @@ class LoginAPIView(KnoxLoginView):
         user = serializer.validated_data['user']
         login(request, user)
         return super(LoginAPIView, self).post(request, format=None)
+
+
+class RegisterAsCoachAPI(generics.ListAPIView):
+    permission_class = [permissions.IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        usr_obj = self.request.user
+        if usr_obj:
+            if usr_obj.user_type == 'U':
+                print("Wlecome to register yourself as a coach : " + usr_obj.first_name)
+                sleep(1)
+                print("Tell us about yourself : ")
+                intro = input()
+                sleep(1)
+                print("Mention years of experience : ")
+                exp = float(input())
+                sleep(1)
+                coach_obj, created = Coach.objects.get_or_create(user=usr_obj, bio=intro, years_of_experience=exp)
+                return Response({"Coach Registered Successfully!"})
+            else:
+                return Response({"Already a Coach/Client obj exists for this user."})
+
+        else:
+            return Response({"No user exists!"})
 
 
 class CoachListAPIView(generics.ListAPIView):
@@ -310,7 +335,6 @@ class OnboardingAPIView(APIView):
                              "cheat_meals": ch_meal, "easily_reach_food": food_srcs, "expectations_from_caoch": excpttns})
         else:
             return Response({"No User Found!!"})
-
 
 
 class SendEmailAPIView(generics.ListAPIView):
