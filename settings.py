@@ -45,6 +45,8 @@ INSTALLED_APPS = [
     'knox'
 ]
 
+
+
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'knox.auth.TokenAuthentication',
@@ -69,7 +71,7 @@ ROOT_URLCONF = 'urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR/'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -83,7 +85,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'wsgi.application'
-
+ASGI_APPLICATION = "letschat.asgi.application"
 
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases

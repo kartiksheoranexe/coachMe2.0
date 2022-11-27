@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.contrib.auth import login
 
 import requests
@@ -9,6 +9,7 @@ from rest_framework.response import Response
 from rest_framework.authtoken.serializers import AuthTokenSerializer
 from rest_framework import generics, permissions
 from rest_framework.views import APIView
+from django.http import HttpResponse, JsonResponse
 
 from knox.models import AuthToken
 from knox.views import LoginView as KnoxLoginView
@@ -25,11 +26,51 @@ from email.mime.base import MIMEBase
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
-from coachMe.models import Coach, Package, User, Client, Mapping, Transaction, ClientOnboard
+from coachMe.models import Coach, Package, User, Client, Mapping, Transaction, ClientOnboard, Room, Message
 from coachMe.serializers import CoachListSerializer, PackageListSerializer, UserSerializer, RegisterUserSerializer
 from coachMe.wrappers import *
 
 # Create your views here.
+
+
+def home(request):
+    return render(request, 'home.html')
+
+def room(request, room):
+    username = request.GET.get('username')
+    room_details = Room.objects.get(name=room)
+    return render(request, 'room.html', {
+        'username': username,
+        'room': room,
+        'room_details': room_details
+    })
+
+def checkview(request):
+    room = request.POST['room_name']
+    username = request.POST['username']
+
+    if Room.objects.filter(name=room).exists():
+        return redirect('/'+room+'/?username='+username)
+    else:
+        new_room = Room.objects.create(name=room)
+        new_room.save()
+        return redirect('/'+room+'/?username='+username)
+
+def send(request):
+    message = request.POST['message']
+    username = request.POST['username']
+    room_id = request.POST['room_id']
+
+    new_message = Message.objects.create(value=message, user=username, room=room_id)
+    new_message.save()
+    return HttpResponse('Message sent successfully')
+
+def getMessages(request, room):
+    room_details = Room.objects.get(name=room)
+
+    messages = Message.objects.filter(room=room_details.id)
+    return JsonResponse({"messages":list(messages.values())})
+
 
 
 class RegisterUserAPIView(generics.GenericAPIView):
@@ -433,7 +474,6 @@ class ParseOnboardAPIView(generics.ListAPIView):
 
                                 if (new_onb[0] == "Goal (Lifestyle/Natural body building)"):
 
-                                    
                                     ana = new_onb[48]
                                     check_y = "yes"
                                     if check_y in ana.lower():
@@ -441,7 +481,7 @@ class ParseOnboardAPIView(generics.ListAPIView):
                                         output = "Y"
 
                                         onb_obj, created = ClientOnboard.objects.get_or_create(coach=coach_obj, client=client_obj, goal=new_onb[0], height=new_onb[11], weight=new_onb[13], neck_inches=new_onb[16], chest_inches=new_onb[20], shoulder_inches=new_onb[18], waist_inches=new_onb[22], quads_inches=new_onb[26], calf_inches=new_onb[24], daily_act_level=new_onb[28], gym_join=new_onb[30], curr_workout_patt=new_onb[32], pref_workout_time=new_onb[
-                                                                                              34], avg_sleeping_hours=new_onb[36], sleep_quality=new_onb[38], stress_levels=new_onb[40], any_diff_mov=new_onb[42], health_related_issues=new_onb[44], supps=new_onb[46], anabolics=output, anabolics_desc=new_onb[48], past_curr_injuries=new_onb[50], veg_non_veg=new_onb[52], no_of_meals=new_onb[54], curr_eating_pattern=new_onb[56], cheat_meals=new_onb[58], easily_reach_food=new_onb[60], expectations_from_caoch=new_onb[61])
+                                            34], avg_sleeping_hours=new_onb[36], sleep_quality=new_onb[38], stress_levels=new_onb[40], any_diff_mov=new_onb[42], health_related_issues=new_onb[44], supps=new_onb[46], anabolics=output, anabolics_desc=new_onb[48], past_curr_injuries=new_onb[50], veg_non_veg=new_onb[52], no_of_meals=new_onb[54], curr_eating_pattern=new_onb[56], cheat_meals=new_onb[58], easily_reach_food=new_onb[60], expectations_from_caoch=new_onb[61])
                                         return Response({"Successfully client onboarded object created!"})
                                     else:
                                         output = "N"

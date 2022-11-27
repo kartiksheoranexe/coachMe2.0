@@ -2,6 +2,7 @@ from django.db import models
 import uuid
 from phone_field import PhoneField
 from django.contrib.auth.models import AbstractUser
+from datetime import datetime
 
 
 GENDER_CHOICES = (
@@ -144,6 +145,7 @@ class Transaction(models.Model):
     def __str__(self):
         return str(self.unique_id)
 
+
 class ClientOnboard(models.Model):
     coach = models.ForeignKey(Coach, on_delete=models.CASCADE)
     client = models.ForeignKey(Client, on_delete=models.CASCADE)
@@ -182,4 +184,11 @@ class ClientOnboard(models.Model):
         return self.coach.user.first_name + ' ' + self.client.user.first_name
     
 
+class Room(models.Model):
+    name = models.CharField(max_length=1000)
 
+class Message(models.Model):
+    value = models.CharField(max_length=1000000)
+    date = models.DateTimeField(default=datetime.now, blank=True)
+    user = models.CharField(max_length=1000000, default=None)
+    room = models.CharField(max_length=1000000)

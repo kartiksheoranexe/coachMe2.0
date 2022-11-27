@@ -17,7 +17,7 @@ from django.contrib import admin
 from django.urls import path
 
 from knox import views as knox_views
-from coachMe.views import CoachListAPIView, DisplayPackageAPIView, RegisterUserAPIView, LoginAPIView, PurchasePackageAPIView, ClientInfoAPIView, OnboardingAPIView, SendEmailAPIView, RegisterAsCoachAPI, ParseOnboardAPIView
+from coachMe.views import CoachListAPIView, DisplayPackageAPIView, RegisterUserAPIView, LoginAPIView, PurchasePackageAPIView, ClientInfoAPIView, OnboardingAPIView, SendEmailAPIView, RegisterAsCoachAPI, ParseOnboardAPIView, home, room, checkview, send, getMessages
 
 
 urlpatterns = [
@@ -36,5 +36,11 @@ urlpatterns = [
 
     path('coach_me/sendonboardfilemail/', SendEmailAPIView.as_view()),
     path('coach_me/parse_onboard/', ParseOnboardAPIView.as_view()),
+
+    path('', home, name='home'),
+    path('<str:room>/', room, name='room'),
+    path('checkview', checkview, name='checkview'),
+    path('send', send, name='send'),
+     path('getMessages/<str:room>/', getMessages, name='getMessages'),
 
 ]
