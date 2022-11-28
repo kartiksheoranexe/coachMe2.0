@@ -49,27 +49,43 @@ def checkview(request):
     room = request.POST['room_name']
     username = request.POST['username']
 
-    if Room.objects.filter(name=room).exists():
-        return redirect('/'+room+'/?username='+username)
+    if User.objects.filter(username=username):
+        if Room.objects.filter(name=room).exists():
+            return redirect('/'+room+'/?username='+username)
+        else:
+            new_room = Room.objects.create(name=room)
+            new_room.save()
+            return redirect('/'+room+'/?username='+username)
     else:
-        new_room = Room.objects.create(name=room)
-        new_room.save()
-        return redirect('/'+room+'/?username='+username)
+        return HttpResponse('Sign up first!')
 
 def send(request):
     message = request.POST['message']
     username = request.POST['username']
     room_id = request.POST['room_id']
 
-    new_message = Message.objects.create(value=message, user=username, room=room_id)
-    new_message.save()
-    return HttpResponse('Message sent successfully')
+    user_obj = User.objects.filter(username=username).first()
+    if user_obj:
+        new_message = Message.objects.create(value=message, user=user_obj, room=room_id)
+        new_message.save()
+        return HttpResponse('Message sent successfully')
+    else:
+        return HttpResponse('Sign up first!')
 
 def getMessages(request, room):
     room_details = Room.objects.get(name=room)
 
     messages = Message.objects.filter(room=room_details.id)
-    return JsonResponse({"messages":list(messages.values())})
+    def get_username(user_id):
+        usr_obj = User.objects.filter(id=user_id).first()
+        username = usr_obj.username
+        return username
+    l = list(messages.values())
+    for i in range(len(l)):
+        l[i]['username'] = get_username(l[i]['user_id'])
+    # return JsonResponse({"messages":list(l.values())})
+        print(l)
+    return JsonResponse({"messages":l})
 
 
 
