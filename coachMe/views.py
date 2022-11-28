@@ -36,6 +36,7 @@ from coachMe.wrappers import *
 def home(request):
     return render(request, 'home.html')
 
+
 def room(request, room):
     username = request.GET.get('username')
     room_details = Room.objects.get(name=room)
@@ -45,11 +46,13 @@ def room(request, room):
         'room_details': room_details
     })
 
+
 def checkview(request):
     room = request.POST['room_name']
     username = request.POST['username']
 
-    if User.objects.filter(username=username):
+    usr_obj = User.objects.filter(username=username)[0]
+    if usr_obj.user_type == 'C' or usr_obj.user_type == 'L':
         if Room.objects.filter(name=room).exists():
             return redirect('/'+room+'/?username='+username)
         else:
@@ -57,7 +60,8 @@ def checkview(request):
             new_room.save()
             return redirect('/'+room+'/?username='+username)
     else:
-        return HttpResponse('Sign up first!')
+        return HttpResponse('Sign up first and hire a coach!')
+
 
 def send(request):
     message = request.POST['message']
@@ -66,16 +70,19 @@ def send(request):
 
     user_obj = User.objects.filter(username=username).first()
     if user_obj:
-        new_message = Message.objects.create(value=message, user=user_obj, room=room_id)
+        new_message = Message.objects.create(
+            value=message, user=user_obj, room=room_id)
         new_message.save()
         return HttpResponse('Message sent successfully')
     else:
         return HttpResponse('Sign up first!')
 
+
 def getMessages(request, room):
     room_details = Room.objects.get(name=room)
 
     messages = Message.objects.filter(room=room_details.id)
+
     def get_username(user_id):
         usr_obj = User.objects.filter(id=user_id).first()
         username = usr_obj.username
@@ -83,10 +90,7 @@ def getMessages(request, room):
     l = list(messages.values())
     for i in range(len(l)):
         l[i]['username'] = get_username(l[i]['user_id'])
-    # return JsonResponse({"messages":list(l.values())})
-        print(l)
-    return JsonResponse({"messages":l})
-
+    return JsonResponse({"messages": l})
 
 
 class RegisterUserAPIView(generics.GenericAPIView):
