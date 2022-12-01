@@ -187,8 +187,11 @@ class ClientOnboard(models.Model):
 class Room(models.Model):
     name = models.CharField(max_length=1000)
 
+
 class Message(models.Model):
     value = models.CharField(max_length=1000000)
     date = models.DateTimeField(default=datetime.now, blank=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     room = models.CharField(max_length=1000000)
+    file_upload = models.FileField(
+        upload_to='messages/%Y/%m/%d', null=True, blank=True)

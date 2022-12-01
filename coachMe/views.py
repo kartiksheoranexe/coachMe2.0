@@ -26,12 +26,12 @@ from email.mime.base import MIMEBase
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
+from coachMe.forms import FileForm
 from coachMe.models import Coach, Package, User, Client, Mapping, Transaction, ClientOnboard, Room, Message
 from coachMe.serializers import CoachListSerializer, PackageListSerializer, UserSerializer, RegisterUserSerializer
 from coachMe.wrappers import *
 
 # Create your views here.
-
 
 def home(request):
     return render(request, 'home.html')
@@ -67,13 +67,33 @@ def send(request):
     message = request.POST['message']
     username = request.POST['username']
     room_id = request.POST['room_id']
-
+    # if request.method == 'POST':
+    print(request.FILES)
+    print("hello1")
+    form = FileForm(request.POST, request.FILES)
+    print(form)
+    if form.is_valid():
+        print("helloooooO2!!!!")
+        file_up = request.FILES['file_upload']
+        print(file_up)
+    print("hello3")
     user_obj = User.objects.filter(username=username).first()
     if user_obj:
-        new_message = Message.objects.create(
-            value=message, user=user_obj, room=room_id)
-        new_message.save()
-        return HttpResponse('Message sent successfully')
+        
+        try:
+            print("hello4")
+            new_message = Message.objects.create(
+                value=message, user=user_obj, room=room_id, file_upload=file_up)
+            new_message.save()
+            print(new_message.file_upload)
+            return HttpResponse('Message sent successfully')
+        except:
+            print("hello5")
+            new_message = Message.objects.create(
+                value=message, user=user_obj, room=room_id, file_upload=None)
+            new_message.save()
+            return HttpResponse('Message sent successfully')
+
     else:
         return HttpResponse('Sign up first!')
 
@@ -90,6 +110,7 @@ def getMessages(request, room):
     l = list(messages.values())
     for i in range(len(l)):
         l[i]['username'] = get_username(l[i]['user_id'])
+        # print(l)
     return JsonResponse({"messages": l})
 
 
