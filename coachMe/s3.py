@@ -18,8 +18,14 @@ resource = boto3.resource(
     region_name = 'ap-southeast-1'
 )
 
+Bucket='coachme-demo-1'
+resource.Bucket(Bucket).upload_file("Rushabhonboard.xlsx", "clientfile")
 
-
+location = {'LocationConstraint': 'ap-southeast-1'}
+client.create_bucket(
+    Bucket='coachme-demo-2',
+    CreateBucketConfiguration=location
+)
 
 
 clientResponse = client.list_buckets()
