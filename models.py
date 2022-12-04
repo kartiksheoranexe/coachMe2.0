@@ -50,6 +50,22 @@ V_NV = (
     ('N', 'Non Veg'),
 )
 
+SPLIT_DAYS = (
+    ('3', 'Three'),
+    ('4', 'Four'),
+    ('5', 'Five'),
+    ('6', 'Six'),
+)
+
+SPLIT_TYPE = (
+    ('FB', 'Full Body'),
+    ('UL', 'Upper Lower'),
+    ('PPL', 'Push, Pull, Legs'),
+    ('BS', 'Bro Split'),
+    ('OTH', 'Other'),
+)
+
+
 
 class User(AbstractUser):
     dob = models.DateField(null=True, blank=True)
@@ -195,3 +211,12 @@ class Message(models.Model):
     room = models.CharField(max_length=1000000)
     file_upload = models.FileField(
         upload_to='messages/%Y/%m/%d', null=True, blank=True)
+
+
+class TrainingSplit(models.Model):
+    clientonboard = models.ForeignKey(ClientOnboard, on_delete=models.CASCADE)
+    split_name = models.CharField(max_length=100)
+    split_desc = models.CharField(max_length=254)
+    split_days = models.CharField(max_length=1, choices=SPLIT_DAYS)
+    split_type = models.CharField(max_length=3, choices=SPLIT_TYPE)
+    
