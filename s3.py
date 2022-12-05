@@ -5,8 +5,8 @@ from botocore.exceptions import ClientError
 from boto3.session import Session
 
 
-ACCESS_KEY = 'XXXXXXXXXXXXXXXX5N5L'
-SECRET_KEY = 'XXXXXXXXXXXXXXXXXXMzONyk1wKgFdBoqNH2BGw7'
+ACCESS_KEY = 'XXXXXXXXXXXXXXXXXXXX'
+SECRET_KEY = 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'
 region = 'ap-southeast-1'
 
 
